@@ -9,12 +9,16 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var showingScore = false
+    @State private var showingGameOverAlert = false
     @State private var scoreTitle = ""
     @State private var scoreMessage = ""
     @State private var score = 0
+    @State private var questionCount = 0
 
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
+
+    private let maxQuestions = 8
 
     var body: some View {
         ZStack {
@@ -68,10 +72,20 @@ struct ContentView: View {
             }
             .padding()
         }
+
         .alert(scoreTitle, isPresented: $showingScore) {
-            Button("Continue", action: askQuestion)
+            Button("Continue", action: continueGame)
         } message: {
             Text(scoreMessage)
+        }
+
+        .alert("Game over", isPresented: $showingGameOverAlert) {
+            Button("Restart", action: {
+                restartGame()
+                askQuestion()
+            })
+        } message: {
+            Text("Your final score is \(score)")
         }
     }
 
@@ -88,9 +102,24 @@ struct ContentView: View {
         showingScore = true
     }
 
+    func continueGame() {
+        questionCount += 1
+
+        if questionCount < maxQuestions {
+            askQuestion()
+        } else {
+            showingGameOverAlert = true
+        }
+    }
+
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+    }
+
+    func restartGame() {
+        questionCount = 0
+        score = 0
     }
 }
 
