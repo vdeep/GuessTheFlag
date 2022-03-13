@@ -29,9 +29,7 @@ struct ContentView: View {
     @State private var countries = ["Estonia", "France", "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
 
-    @State private var rotationAnimationAmount = 0.0
-    @State private var selectedFlag = -1
-    @State private var buttonOpacity = 1.0
+    @State private var selectedFlag: Int? = nil
 
     private let maxQuestions = 8
 
@@ -64,15 +62,14 @@ struct ContentView: View {
                         Button {
                             withAnimation {
                                 selectedFlag = number
-                                rotationAnimationAmount = 1
-                                buttonOpacity = 0.25
                             }
                             flagTapped(number)
                         } label: {
                             FlagImage(country: countries[number])
                         }
-                        .rotation3DEffect(.degrees(selectedFlag == number ? rotationAnimationAmount * 360 : 0), axis: (x: 0, y: 1, z: 0))
-                        .opacity((selectedFlag == -1 || selectedFlag == number) ? 1 : buttonOpacity)
+                        .rotation3DEffect(.degrees(selectedFlag == number ? 360 : 0), axis: (x: 0, y: 1, z: 0))
+                        .opacity((selectedFlag == nil || selectedFlag == number) ? 1 : 0.25)
+                        .scaleEffect((selectedFlag == nil || selectedFlag == number) ? 1 : 0.80)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -123,9 +120,7 @@ struct ContentView: View {
 
     func continueGame() {
         questionCount += 1
-        selectedFlag = -1
-        rotationAnimationAmount = 0.0
-        buttonOpacity = 1.0
+        selectedFlag = nil
 
         if questionCount < maxQuestions {
             askQuestion()
